@@ -123,5 +123,5 @@ def check(site_id):
 @periodic_task(run_every=60)
 def schedule(force=False):
     for site in Site.objects.all():
-        if site.needs_check and not site.broken:
+        if site.needs_check:
             Task.delay(check, site.id)
