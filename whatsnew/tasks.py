@@ -24,13 +24,13 @@ def debug_task(self):
 @shared_task()
 def fetch(url, navigation):
     log.info("Fetching %s" % url)
-    resp = requests.get(url, timeout=10)
+    resp = requests.get(url, timeout=30, verify=False)
     page = lxml.html.fromstring(resp.content)
     page.make_links_absolute(base_url=url)
     if navigation:
         nav_url = page.xpath(navigation)[0]
         log.info("Navigating to %s" % (nav_url))
-        nav_resp = requests.get(nav_url)
+        nav_resp = requests.get(nav_url, timeout=30, verify=False)
         page = lxml.html.fromstring(nav_resp.content)
         page.make_links_absolute(base_url=nav_url)
     return page
