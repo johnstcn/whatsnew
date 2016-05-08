@@ -9,6 +9,7 @@ from pytz import utc
 from whatsnew.models import *
 
 import lxml.html
+from lxml.etree import XMLSyntaxError
 import requests
 import re
 
@@ -84,6 +85,11 @@ def check(site_id):
         site.last_checked = datetime.now(utc)
         site.save()
         return "NAVIGATION_FAILED"
+    except XMLSyntaxError:
+        log.error("Invalid HTML for site %s" % (site.name))
+        site.last_checked = datetime.now(utc)
+        site.save()
+        return "INVALID_HTML"
 
     try:
         url, ref = extract(site.ref_xpath,
