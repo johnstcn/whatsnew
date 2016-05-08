@@ -61,9 +61,10 @@ li#nsfw a {
 <body>
 <div class="container-fluid">
 <div class="well text-center">
-<h1>What's New</h1>
-<h3>We check webcomics on the hour, every hour.</h3>
-<h3>So you don't have to.</h3>
+<h1>FreshComics</h1>
+<p>We check webcomics on the hour, every hour.
+    <br />
+So you don't have to.</p>
 </div>
 {% if messages %}
 
@@ -74,7 +75,7 @@ li#nsfw a {
 </ul>
 {% endif %}
 
-{% if info.personal %}
+{% if info.personal.items %}
 <ul id="personal" class="list-group">
 {% for site in info.personal.items %}
 {% if site.highlight %}
@@ -99,7 +100,7 @@ li#nsfw a {
 {% endfor %}
 </ul>
 {% endif %}
-{% if info.generic %}
+{% if info.generic.items %}
 <ul class="list-group">
 {% for site in info.generic.items %}
 <li class="list-group-item">
@@ -124,10 +125,9 @@ li#nsfw a {
 </li>
 {% endif %}
 </ul>
-<div class="well text-center"><h3>Want more? Check out the tags!</h3>
+<div class="well text-center"><h3>Try some tags!</h3>
 {% else %}
-<div class="well text-center"><h3>Nothing here :(</h3>
-<h4>Try something else!</h4>
+<div class="well text-center"><h3>Whoops!</h3><p>Nothing here. Try some tags!</p>
 {% endif %}
 <ul class="pager">
     {% if info.tags %}
