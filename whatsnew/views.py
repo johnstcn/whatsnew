@@ -58,11 +58,11 @@ class SitesView(generic.ListView):
             "more": 0
         }
         tag = self.kwargs.get("tag", "all")
+        out["items"].sort(key=itemgetter("highlight", "date"), reverse=True)
         if limit is not None and tag == "all":
             out["more"] = len(queryset) - limit
             out["items"] = out["items"][:limit]
 
-        out["items"].sort(key=itemgetter("highlight", "date"), reverse=True)
         return out
 
     def highlight(self, site_update):
