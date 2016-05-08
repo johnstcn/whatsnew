@@ -75,6 +75,11 @@ def check(site_id):
     status = ""
     try:
         page = fetch(site.base_url, site.navigation)
+    except requests.exceptions.ConnectionError as e:
+        log.error("Error fetching %s: %s" % (site.base_url, str(e)))
+        site.last_checked = datetime.now(utc)
+        site.save()
+        return "CONNECTION_ERROR"
     except requests.exceptions.Timeout:
         log.error("Timeout fetching %s" % (site.base_url))
         site.last_checked = datetime.now(utc)
