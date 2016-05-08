@@ -1,0 +1,6 @@
+app.yml
+dump.sql
+celerybeat-schedule
+*.pyc
+*.sqlite3
+whatsnew/migrations/*

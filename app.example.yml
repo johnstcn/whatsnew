@@ -1,0 +1,6 @@
+---
+database:
+  user: "change_me"
+  password: "change_me"
+secret_key: "change_me"
+env: "production"
