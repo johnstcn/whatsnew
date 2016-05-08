@@ -74,7 +74,7 @@ LOGGING = {
             'level': 'INFO',
             'disabled': False
         },
-        'thingsforwork': {
+        'whatsnew': {
             'handlers': ['console', 'syslog'],
             'level': 'DEBUG',
             'propagate': False,
