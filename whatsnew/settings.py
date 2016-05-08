@@ -199,7 +199,7 @@ CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'UTC'
 CELERY_IMPORTS = ('whatsnew.tasks')
 
-ENABLE_CACHE = False
+ENABLE_CACHE = (APP_CONFIG['env'] != 'development')
 if ENABLE_CACHE:
     CACHES = {
         'default': {
@@ -207,7 +207,7 @@ if ENABLE_CACHE:
             'LOCATION': '/var/tmp/django_cache',
             'OPTIONS': {
                 'MAX_ENTRIES': 1000,
-                'TIMEOUT': 10,
+                'TIMEOUT': 60,
             }
         }
     }
