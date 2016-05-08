@@ -89,7 +89,7 @@ WSGI_APPLICATION = 'whatsnew.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'djangodb',
+        'NAME': APP_CONFIG['database']['db'],
         'USER': APP_CONFIG['database']['user'],
         'PASSWORD': APP_CONFIG['database']['password'],
         'HOST': 'localhost',
