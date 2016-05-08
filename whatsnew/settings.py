@@ -30,7 +30,7 @@ SECRET_KEY = APP_CONFIG['secret_key']
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = (APP_CONFIG['env'] == 'development')
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
 
 # Application definition
