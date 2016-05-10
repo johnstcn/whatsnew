@@ -1,7 +1,7 @@
 from django.views import generic
 from django.contrib import messages
 from django.shortcuts import redirect
-from django.core.exceptions import ObjectDoesNotExist
+from django.db.models.aggregates import Max
 
 from operator import itemgetter
 
@@ -33,6 +33,28 @@ def redirect_to_update(request, site_update_id):
     except ObjectDoesNotExist:
         messages.error(request, 'Sorry, something went wrong!')
         return redirect(request.META['HTTP_REFERER'])
+
+class AllSitesView(generic.ListView):
+    template_name = 'all_sites.html'
+    context_object_name = 'sites'
+    model = Site
+    paginate_by = 10
+
+    def get_queryset(self):
+        sites = Site.objects.annotate(Max('siteupdate__date')).order_by('-siteupdate__date__max')
+        tag = self.kwargs.get("tag", "all")
+        nsfw = self.kwargs.get("nsfw", "0")
+        if tag != "all":
+            sites = sites.filter(site_tags__name=tag)
+        if nsfw == "0":
+            sites = sites.exclude(site_tags__name="nsfw")
+        return sites
+
+    def get_context_data(self, **kwargs):
+        context = super(AllSitesView, self).get_context_data(**kwargs)
+        tags = [t.name for t in Tag.objects.all() if t.name != 'nsfw']
+        context["tags"] = tags
+        return context
 
 
 class SitesView(generic.ListView):
