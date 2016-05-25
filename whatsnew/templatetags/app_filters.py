@@ -14,3 +14,8 @@ def custom_natural_date(value):
         return naturaltime(value)
     else:
         return naturalday(value)
+
+
+@register.filter(name="get_int_key")
+def get_int_key(d, key):
+    return d.get(unicode(key))
