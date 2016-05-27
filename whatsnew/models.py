@@ -7,6 +7,7 @@ from django.db import models
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.postgres.fields import JSONField
 from django.contrib.auth.models import User
+from django.db.models import signals
 
 class Site(models.Model):
     name = models.CharField(max_length=200)
@@ -63,3 +64,10 @@ class Tag(models.Model):
 class UserSeen(models.Model):
     user = models.OneToOneField(User, null=False, blank=False)
     seen = JSONField(dict)
+
+
+def create_userseen(sender, instance, created, **kwargs):
+    if created:
+        UserSeen.objects.create(user=instance, seen={})
+
+signals.post_save.connect(create_userseen, sender=User)
