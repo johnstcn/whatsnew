@@ -66,6 +66,13 @@ class UserSeen(models.Model):
     seen = JSONField(dict)
 
 
+class AccessCode(models.Model):
+    user = models.OneToOneField(User, null=False, blank=False)
+    code = models.CharField(max_length=200)
+    used = models.BooleanField(null=False, blank=False, default=False)
+
+
+
 def create_userseen(sender, instance, created, **kwargs):
     if created:
         UserSeen.objects.create(user=instance, seen={})
