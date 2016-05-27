@@ -5,7 +5,8 @@ from pytz import utc
 
 from django.db import models
 from django.core.exceptions import ObjectDoesNotExist
-from django.contrib.sessions.models import Session
+from django.contrib.postgres.fields import JSONField
+from django.contrib.auth.models import User
 
 class Site(models.Model):
     name = models.CharField(max_length=200)
@@ -57,3 +58,8 @@ class Tag(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class UserSeen(models.Model):
+    user = models.OneToOneField(User, null=False, blank=False)
+    seen = JSONField(dict)

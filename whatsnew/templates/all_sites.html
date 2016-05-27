@@ -2,129 +2,166 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="icon" href="/static/images/favicon.ico">
-    <script src="/static/js/jquery.min.js"></script>
-    <link rel="stylesheet" href="/static/css/bootstrap.min.css">
-    <link rel="stylesheet" href="/static/css/bootstrap-theme.min.css">
-    <script src="/static/js/bootstrap.min.js"></script>
-    <script type="text/javascript">
-    // Automatically reload on focus
-    window.onblur = function() {
-        window.onfocus = function() {
-            location.reload(true);
-        }
-    };
-
-
-    </script>
-    <style>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="/static/images/favicon.ico">
+<script src="/static/js/jquery.min.js"></script>
+<link rel="stylesheet" href="/static/css/bootstrap.min.css">
+<link rel="stylesheet" href="/static/css/bootstrap-theme.min.css">
+<script src="/static/js/bootstrap.min.js"></script>
+<style>
 .well h1 {
-    margin-left: auto;
-    margin-right: auto;
+margin-left: auto;
+margin-right: auto;
 }
 .list-group, .container-fluid {
-    max-width: 800px;
-    margin-left: auto;
-    margin-right: auto;
+max-width: 800px;
+margin-left: auto;
+margin-right: auto;
 }
 .tag { 
-    float: right;
-    margin: 0.1em;
+float: right;
+margin: 0.1em;
 }
 .tag a {
-    text-decoration: none;
-    color: white;
+text-decoration: none;
+color: white;
 }
 .row {
-    margin-left: 0.5em;
-    margin-right: 0.5em;
+margin-left: 0.5em;
+margin-right: 0.5em;
 }
 a.btn {
-    margin-left: auto;
-    margin-right: auto;
-    margin-top: 1em;
-    margin-bottom: 1em;
+margin-left: auto;
+margin-right: auto;
+margin-top: 1em;
+margin-bottom: 1em;
 }
-li#clear a {
-    background: #5bc0de;
-    color: #ffffff;
+li#watched a {
+background: #5bc0de;
+color: #ffffff;
 }
 li#nsfw a {
-    background: #d9534f;
+background: #d9534f;
+color: #ffffff;
+}
+.watch, .unwatch {
+float: right;
+font-color: #d9534f;
+}
+#tags a.active {
     color: #ffffff;
 }
-.nope {
-    float: right;
-    font-color: #d9534f;
-}
 
-
-    </style>
+</style>
 </head>
 <body>
 <ul class="container-fluid">
-    <div class="well text-center">
-        <h1>FreshComics</h1>
-        <p>We check webcomics on the hour, every hour.
-            <br/>
-            So you don't have to.</p>
+    <div class="well text-center"><a href="/">
+            <h1>FreshComics</h1>
+            <p>We check webcomics on the hour, every hour.<br/>So you don't have to.</p>
+        </a>
     </div>
-    <ul class="pager">
-        {% if tags %}
-        {% for tag in tags %}
-        {% if view.kwargs.tag == tag %}
-        <li class="disabled"><a href="{% url 'index' tag=tag nsfw=view.kwargs.nsfw %}">{{ tag }}</a></li>
-        {% else %}
-        <li><a href="{% url 'index' tag=tag nsfw=view.kwargs.nsfw %}">{{ tag }}</a></li>
-        {% endif %}
-        {% endfor %}
-        {% endif %}
-    </ul>
-    <ul class="pager">
-        <li id="clear" class="previous">
-            <a href="{% url 'index' tag='all' nsfw='0' %}">Clear Filters</a></li>
-        <li id="nsfw" class="next">
-            {% if view.kwargs.nsfw == '1' %}
-            <a href="{% url 'index' tag=view.kwargs.tag nsfw=0 %}">Hide NSFW</a>
-            {% else %}
-            <a href="{% url 'index' tag=view.kwargs.tag nsfw=1 %}">Show NSFW</a>
-            {% endif %}
-        </li>
-    </ul>
-    {% if sites %}
-    <ul class="list-group">
-        {% for site in sites %}
-        <li class="list-group-item">
-            <h3>
-                <a target="_blank" href="{% url 'redirect_to_update' site_update_id=site.latest_update.id %}">{{ site.name }}</a>
-            </h3>
-            {% for tag in site.site_tags.all %}
-            {% if tag.name == "nsfw" %}
-            <span class="tag label label-danger">{{ tag.name }}</span>
-            {% else %}
-            <span class="tag label label-default">
-                <a href="{% url 'index' tag=tag nsfw=view.kwargs.nsfw %}">{{ tag.name }}</a>
-            </span>
-            {% endif %}
-            {% endfor %}
-            <small>{{ site.latest_update.date | custom_natural_date }}</small>
-        </li>
-        {% endfor %}
-        {% endif %}
-    </ul>
-   {% if is_paginated %}
-        <ul class="pager">
 
-                {% if page_obj.has_previous %}
-                    <li class="previous"><a href="?page={{ page_obj.previous_page_number }}">&larr; Previous</a></li>
-                {% endif %}
-                <li class="disabled">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</li>
-                {% if page_obj.has_next %}
-                    <li class="next"><a href="?page={{ page_obj.next_page_number }}">Next &rarr;</a></li>
-                {% endif %}
+    {% if messages %}
+        <ul class="messages list-group">
+        {% for message in messages %}
+            {% if message.tags %}
+            <li class="text-center list-group-item list-group-item-{{ message.tags }}">{{ message }}</li>
+            {% else %}
+            <li class="text-center list-group-item">{{ message }}</li>
+            {% endif %}
+        {% endfor %}
         </ul>
     {% endif %}
-</div>
+
+    <ul class="pager">
+            {% if not request.user.is_anonymous %}
+                {% if only_watched == '1' %}
+                    <li class="previous" id="watched"><a href="{% url 'index' tag=selected_tag nsfw=show_nsfw watched=0 %}">All</a></li>
+                {% else %}
+                    <li class="previous" id="watched"><a href="{% url 'index' tag=selected_tag nsfw=show_nsfw watched=1 %}">Watched</a></li>
+                {% endif %}
+            {% else %}
+                <li class="previous"><a href="/sign_in">Sign in</a></li>
+            {% endif %}
+            <li class="next" id="nsfw">
+            {% if view.kwargs.nsfw == '1' %}
+                <a href="{% url 'index' tag=selected_tag nsfw=0 %}">Hide NSFW</a>
+            {% else %}
+                <a href="{% url 'index' tag=selected_tag nsfw=1 %}">Show NSFW</a>
+            {% endif %}
+        </li>
+    </ul>
+
+    {% if sites %}
+        <ul class="list-group">
+            {% for site in sites %}
+                {% with next_update_id=next_updates|get_int_key:site.id %}
+                    {% if next_update_id != None %}
+                        <li class="list-group-item list-group-item-info">
+                    {% else %}
+                        <li class="list-group-item">
+                    {% endif %}
+                {% if not request.user.is_anonymous %}
+                    {% if site.id|slugify in seen.keys %}
+                        <span class="unwatch"><a href="{% url 'unwatch' site_id=site.id %}">&#x274c;</a></span>
+                    {% else %}
+                        <span class="watch"><a href="{% url 'watch' site_id=site.id %}">&#x1f441;</a></span>
+                    {% endif %}
+                {% endif %}
+                <h3>
+                {% if next_update_id != None %}
+                    <a target="_blank" href="{% url 'redirect_to_update' site_update_id=next_update_id %}">{{ site.name }}</a>
+                {% else %}
+                    <a target="_blank" href="{% url 'redirect_to_update' site_update_id=site.latest_update.id %}">{{ site.name }}</a>
+                {% endif %}
+                </h3>
+            {% for tag in site.site_tags.all %}
+                {% if tag.name == "nsfw" %}
+                    <span class="tag label label-danger">{{ tag.name }}</span>
+                {% else %}
+                    <span class="tag label label-default">{{ tag.name }}</span>
+                {% endif %}
+            {% endfor %}
+            <time datetime="{{ site.latest_update.date|date:'c' }}">{{ site.latest_update.date | custom_natural_date }}</time>
+            </li>
+            {% endwith %}
+        {% endfor %}
+        </ul>
+    {% endif %}
+
+
+    {% if is_paginated %}
+        <ul class="pager">
+        {% if page_obj.has_previous %}
+            <li class="previous"><a href="?page={{ page_obj.previous_page_number }}">&larr; Previous</a></li>
+        {% endif %}
+
+        <li class="disabled">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</li>
+        {% if page_obj.has_next %}
+            <li class="next"><a href="?page={{ page_obj.next_page_number }}">Next &rarr;</a></li>
+        {% endif %}
+        </ul>
+    {% endif %}
+
+
+
+    <div class="well text-center">
+        <h3>Tags</h3>
+
+        <ul class="pager" id="tags">
+        {% if tags %}
+            {% for tag in tags %}
+                {% if selected_tag == tag %}
+                    <span class="label"><a class="disabled">{{ tag }}</a></span>
+                {% else %}
+                    <span class="label label-default"><a class="active" href="{% url 'index' tag=tag nsfw=show_nsfw %}">{{ tag }}</a></span>
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+        </ul>
+    </div>
+
+    </div>
 </body>
 </html>
