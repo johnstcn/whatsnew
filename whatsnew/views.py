@@ -1,10 +1,13 @@
-from django.views import generic
 from django.contrib import messages
-from django.http import HttpResponseRedirect
-from django.shortcuts import redirect
-from django.db.models.aggregates import Max
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login
+from django.db.models.aggregates import Max
+from django.http import HttpResponseRedirect
+from django.shortcuts import redirect
+from django.views import generic
+from django.views.decorators.cache import never_cache
+from django.utils.decorators import method_decorator
+
 
 from .models import *
 from .forms import *
