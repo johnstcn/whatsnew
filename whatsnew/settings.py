@@ -149,6 +149,15 @@ DATABASES = {
 }
 
 
+# Authentication
+AUTHENTICATION_BACKENDS = [
+    'whatsnew.backends.OneTimeLinkAuthBackend',
+    'django.contrib.auth.backends.ModelBackend',
+]
+
+AUTH_RATE_LIMIT = datetime.timedelta(seconds=60)
+
+
 # Password validation
 # https://docs.djangoproject.com/en/1.9/ref/settings/#auth-password-validators
 
