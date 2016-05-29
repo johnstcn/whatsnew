@@ -1,13 +1,16 @@
 from django.views import generic
 from django.contrib import messages
+from django.http import HttpResponseRedirect
 from django.shortcuts import redirect
 from django.db.models.aggregates import Max
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth import authenticate, login
 
 from .models import *
+from .forms import *
 
 
+@login_required
 def watch(request, site_id):
     return_url = request.META.get('HTTP_REFERER', '/')
     if not request.user.is_anonymous():
@@ -21,6 +24,7 @@ def watch(request, site_id):
     return redirect(return_url)
 
 
+@login_required
 def unwatch(request, site_id):
     return_url = request.META.get('HTTP_REFERER', '/')
     if not request.user.is_anonymous():
@@ -105,3 +109,37 @@ class SitesView(generic.ListView):
         context['seen'] = seen
 
         return context
+
+
+class SignUpView(generic.FormView):
+    template_name = 'sign_in.html'
+    form_class = SignUpForm
+    success_url = '/'
+
+    def dispatch(self, request):
+        if self.request.user.is_anonymous():
+            return super(SignUpView, self).dispatch(request)
+        else:
+            messages.warning(self.request, 'You are already signed in!')
+            return HttpResponseRedirect('/')
+
+    def form_valid(self, form):
+        form.send_signin_email()
+        messages.info(self.request, 'Check your email for a link to sign in!')
+        return super(SignUpView, self).form_valid(form)
+
+
+class AuthenticateView(generic.RedirectView):
+    permanent = False
+    query_string = False
+
+    def get_redirect_url(self, *args, **kwargs):
+        auth_code = self.kwargs.get('auth_code', '')
+        try:
+            user = authenticate(code=auth_code)
+            login(self.request, user)
+            messages.success(self.request, 'Welcome %s!' %(user.username))
+        except ObjectDoesNotExist:
+            messages.error(self.request, "Sorry, we couldn't figure out who you are.")
+        finally:
+            return '/'
