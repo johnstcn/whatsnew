@@ -10,15 +10,17 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.9/ref/settings/
 """
 
+import datetime
 import os
 import yaml
 
 with open('app.yml') as f:
     APP_CONFIG = yaml.load(f)
 
+ENV = APP_CONFIG.get('env', 'development')
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.9/howto/deployment/checklist/
@@ -28,7 +30,7 @@ SESSION_COOKIE_AGE = 60 * 60 * 24 * 7
 SECRET_KEY = APP_CONFIG['secret_key']
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = (APP_CONFIG['env'] == 'development')
+DEBUG = (ENV == 'development')
 
 ALLOWED_HOSTS = ['*']
 
@@ -199,7 +201,7 @@ CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'UTC'
 CELERY_IMPORTS = ('whatsnew.tasks')
 
-ENABLE_CACHE = (APP_CONFIG['env'] != 'development')
+ENABLE_CACHE = (ENV != 'development')
 if ENABLE_CACHE:
     CACHES = {
         'default': {
