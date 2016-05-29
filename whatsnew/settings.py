@@ -219,22 +219,3 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'UTC'
 CELERY_IMPORTS = ('whatsnew.tasks')
-
-ENABLE_CACHE = (ENV != 'development')
-if ENABLE_CACHE:
-    CACHES = {
-        'default': {
-            'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
-            'LOCATION': '/var/tmp/django_cache',
-            'OPTIONS': {
-                'MAX_ENTRIES': 1000,
-                'TIMEOUT': 60,
-            }
-        }
-    }
-else:
-    CACHES = {
-        'default': {
-            'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
-        }
-    }
