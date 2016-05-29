@@ -11,5 +11,7 @@ urlpatterns = [
     url(r'^sites/(?P<tag>[\w-]*)/(?P<nsfw>\d)/(?P<watched>\d)/$', views.SitesView.as_view(), name='index'),
     url(r'^view/(?P<site_update_id>\d+)/$', views.redirect_to_update, name='redirect_to_update'),
     url(r'^watch/(?P<site_id>\d+)/$', views.watch, name='watch'),
-    url(r'^unwatch/(?P<site_id>\d+)/$', views.unwatch, name='unwatch')
+    url(r'^unwatch/(?P<site_id>\d+)/$', views.unwatch, name='unwatch'),
+    url(r'^sign_in', views.SignUpView.as_view(), name='sign_in'),
+    url(r'^authenticate/(?P<auth_code>[a-f0-9]+)/$', views.AuthenticateView.as_view(), name='authenticate'),
 ]
