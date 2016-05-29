@@ -20,3 +20,4 @@ requests==2.9.1
 six==1.10.0
 tornado==4.2
 wsgiref==0.1.2
+sendgrid-django==2.0.0

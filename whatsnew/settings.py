@@ -177,6 +177,14 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
+# Email configuration
+if ENV == 'development':
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+else:
+    EMAIL_BACKEND = "sgbackend.SendGridBackend"
+
+SENDGRID_API_KEY = APP_CONFIG.get('sendgrid_api_key')
+
 # Internationalization
 # https://docs.djangoproject.com/en/1.9/topics/i18n/
 
