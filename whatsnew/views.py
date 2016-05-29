@@ -41,6 +41,7 @@ def unwatch(request, site_id):
     return redirect(return_url)
 
 
+@never_cache
 def redirect_to_update(request, site_update_id):
     return_url = request.META.get('HTTP_REFERER', '/')
     update = SiteUpdate.objects.filter(pk=site_update_id).get()
@@ -58,6 +59,7 @@ def redirect_to_update(request, site_update_id):
     return redirect(update.url)
 
 
+@method_decorator(never_cache, name='dispatch')
 class SitesView(generic.ListView):
     template_name = 'all_sites.html'
     context_object_name = 'sites'
@@ -114,6 +116,7 @@ class SitesView(generic.ListView):
         return context
 
 
+@method_decorator(never_cache, name='dispatch')
 class SignUpView(generic.FormView):
     template_name = 'sign_in.html'
     form_class = SignUpForm
@@ -132,6 +135,7 @@ class SignUpView(generic.FormView):
         return super(SignUpView, self).form_valid(form)
 
 
+@method_decorator(never_cache, name='dispatch')
 class AuthenticateView(generic.RedirectView):
     permanent = False
     query_string = False
