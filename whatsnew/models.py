@@ -8,6 +8,10 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.postgres.fields import JSONField
 from django.contrib.auth.models import User
 from django.db.models import signals
+from uuid import uuid4
+
+import string
+from random import choice
 
 class Site(models.Model):
     name = models.CharField(max_length=200)
@@ -66,11 +70,33 @@ class UserSeen(models.Model):
     seen = JSONField(dict)
 
 
+def now():
+    return datetime.utcnow()
+
+def access_code_default():
+    return uuid4().get_hex()
+
+
 class AccessCode(models.Model):
     user = models.OneToOneField(User, null=False, blank=False)
-    code = models.CharField(max_length=200)
-    used = models.BooleanField(null=False, blank=False, default=False)
+    code = models.CharField(max_length=200, default=access_code_default, null=True)
+    updated = models.DateTimeField(default=now)
 
+    def regenerate(self):
+        self.code = access_code_default()
+        self.updated = now()
+        self.save()
+
+
+def create_or_get_user_from_email(email):
+    try:
+        user = User.objects.get(email=email)
+    except ObjectDoesNotExist:
+        chars = string.letters + string.digits + string.punctuation
+        length = 64
+        random_passwd = ''.join((choice(chars) for _ in range(length)))
+        user = User.objects.create_user(username=email, email=email, password=random_passwd)
+    return user
 
 
 def create_userseen(sender, instance, created, **kwargs):
@@ -78,3 +104,10 @@ def create_userseen(sender, instance, created, **kwargs):
         UserSeen.objects.create(user=instance, seen={})
 
 signals.post_save.connect(create_userseen, sender=User)
+
+
+def create_user_access_code(sender, instance, created, **kwargs):
+    if created:
+        AccessCode.objects.create(user=instance)
+
+signals.post_save.connect(create_user_access_code, sender=User)
